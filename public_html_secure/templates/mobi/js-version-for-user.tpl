@@ -1,0 +1,9 @@
+<!--<script src="/jlogic/mobi/minify/jquery.min.js"></script>
+<script src="/jlogic/mobi/minify/tether.min.js"></script>
+<script src="/jlogic/mobi/minify/bootstrap.min.js"></script>
+<script src="/jlogic/mobi/minify/animsition.min.js"></script>
+<script src="/jlogic/mobi/minify/bootstrap-slider.min.js"></script>
+<script src="/jlogic/mobi/minify/jquery.isotope.min.js"></script>
+<script src="/jlogic/mobi/minify/headroom.min.js"></script>
+<script src="/jlogic/mobi/minify/foodpicky.min.js"></script>-->
+<script src="/jlogic/mobi/build.js"></script>

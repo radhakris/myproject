@@ -1,0 +1,8 @@
+[10-Sep-2018 17:00:17 Etc/GMT] PHP Notice:  Undefined index: DEBUG in /home/shorthu4/public_html/scripts/Mysql.php on line 225
+[10-Sep-2018 17:00:17 Etc/GMT] PHP Notice:  Unknown column 'status' in 'where clause' in /home/shorthu4/public_html/scripts/Mysql.php on line 234
+[10-Sep-2018 17:00:17 Etc/GMT] PHP Fatal error:  Call to a member function fetchAll() on a non-object in /home/shorthu4/public_html/scripts/adminPage.php on line 68
+[10-Sep-2018 17:00:24 Etc/GMT] PHP Notice:  Undefined index: DEBUG in /home/shorthu4/public_html/scripts/Mysql.php on line 225
+[10-Sep-2018 17:00:24 Etc/GMT] PHP Notice:  Unknown column 'status' in 'where clause' in /home/shorthu4/public_html/scripts/Mysql.php on line 234
+[10-Sep-2018 17:00:24 Etc/GMT] PHP Fatal error:  Call to a member function fetchAll() on a non-object in /home/shorthu4/public_html/scripts/adminPage.php on line 68
+[10-Sep-2018 17:01:14 Etc/GMT] PHP Notice:  Undefined index: DEBUG in /home/shorthu4/public_html/scripts/Mysql.php on line 225
+[10-Sep-2018 17:01:14 Etc/GMT] PHP Notice:  Undefined variable: error in /home/shorthu4/public_html/scripts/adminPage.php on line 69
