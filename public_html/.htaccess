@@ -7,6 +7,21 @@ allow from all
 
 
 RewriteEngine On
+# for root URL
+RewriteCond %{HTTP_HOST} shortheadlines\.com [NC]
+RewriteCond %{REQUEST_URI} ^/$
+RewriteRule ^(.*)$ /scripts/ad-controller.php?module=$1 [L,QSA]
+# for root URL ends
+
+# Added by jana
+RewriteRule ^(img)/([0-9]{2,3})x([0-9]{2,3})x([0-9]{2,3})/(.*)$ /scripts/timthumb.php?w=$2&q=$3&h=$4&src=/img/$5
+
+# Added by jana
+RewriteRule ^(img)/([0-9]{2,3})x([0-9]{2,3})/(.*)$ /scripts/timthumb.php?w=$2&q=100&src=/img/$4
+
 
 RewriteRule ^([a-zA-Z0-9_-]+)$ /scripts/ad-controller.php?module=$1 [L,QSA]
 RewriteRule ^([a-zA-Z0-9_-]+)/$ /scripts/ad-controller.php?module=$1 [L,QSA]
+
+
+

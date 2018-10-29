@@ -65,7 +65,7 @@ if(! defined('FILE_CACHE_PREFIX') ){
         }
 }
 if(! defined('FILE_CACHE_DIRECTORY') ){
-	$secure_folder_path = dirname(dirname(dirname(dirname(__FILE__))))."/public_html_secure";
+	$secure_folder_path = dirname(dirname(dirname(__FILE__)))."/public_html_secure";
 	if($user_agent == 'desktop'){
 		define ('FILE_CACHE_DIRECTORY', $secure_folder_path.'/all_cache/timthumb_cache'); // Directory where images are cached. Left blank it will use the system temporary directory (which is better for security)
 	}else{
@@ -245,6 +245,7 @@ class timthumb {
 		//On windows systems I'm assuming fileinode returns an empty string or a number that doesn't change. Check this.
 		$this->salt = @filemtime(__FILE__) . '-' . @fileinode(__FILE__);
 		$this->debug(3, "Salt is: " . $this->salt);
+		//exit(FILE_CACHE_DIRECTORY);
 		if(FILE_CACHE_DIRECTORY){
 			if(! is_dir(FILE_CACHE_DIRECTORY)){
 				@mkdir(FILE_CACHE_DIRECTORY);

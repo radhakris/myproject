@@ -54,7 +54,7 @@
               <th >Company Name</th>
               <th >Type</th>
               <th >IT Park Name</th>
-              <th>Address</th>
+              <th style="width: 35%;">Address</th>
               <th >City</th>
               <th >Added Date</th>
               <th >Action</th>
@@ -74,7 +74,7 @@
                 <td>{$data.$a.corp_city}</td>
                 <td>{$data.$a.corp_added_date}</td>
                 <td>
-                  <a href="javascript:" id="edit_{$data.$a.corp_id}" name="edit_{$data.$a.corp_id}" onclick="javascript:doAptOperationCorporate('edit',{$data.$a.corp_id});" title="Edit Corporate '{$data.$a.corp_name}'" alt="Edit Corporate '{$data.$a.corp_name}'"><i class="fa fa-edit" style="font-size:20px;color:red"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <!--<a href="javascript:" id="edit_{$data.$a.corp_id}" name="edit_{$data.$a.corp_id}" onclick="javascript:doAptOperationCorporate('edit',{$data.$a.corp_id});" title="Edit Corporate '{$data.$a.corp_name}'" alt="Edit Corporate '{$data.$a.corp_name}'"><i class="fa fa-edit" style="font-size:20px;color:red"></i></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
 									<a href="javascript:" id="delete_{$data.$a.corp_id}" name="delete_{$data.$a.corp_id}" onclick="javascript:doAptOperationCorporate('delete',{$data.$a.corp_id});" title="Delete Corporate '{$data.$a.corp_name}'" alt="Delete Corporate '{$data.$a.corp_name}'" ><i class="fa fa-trash-o" style="font-size:20px;color:red"></i></a>
                 </td>
                 </tr>

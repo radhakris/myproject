@@ -78,16 +78,19 @@
                                  {else}
                                  <div class="figure-wrap bg-image" data-image-src="/img/{$data.$a.image}">
                                  {/if}
-                                <div {if $data.$a.type eq 'veg'} class="veg" {else} class="distance"{/if}><i class="fa fa-pin"></i>Non-Veg</div>
-                                   
+                                 {if $data.$a.type eq 'veg'}
+                                    <div class="veg"><i class="fa fa-pin"></i>Veg</div>
+                                 {else}
+                                    <div class="distance"><i class="fa fa-pin"></i>Non-Veg</div>
+                                 {/if}
                                 </div>
                                 <div class="content">
-                                    <h5><a href="profile.html">{$data.$a.name}</a></h5>
+                                    <h5><a href="/order_food">{$data.$a.name}</a></h5>
                                   <!--  <div class="product-name">Fried Chicken with cheese</div>-->
                                   {if $data.$a.sprice eq ''}
-                                    <div class="price-btn-block"> <span class="price">Rs {$data.$a.price}</span> <a href="#" class="btn theme-btn-dash pull-right">Order Now</a> </div>
+                                    <div class="price-btn-block"> <span class="price">Rs {$data.$a.price}</span> <a href="/order_food" class="btn theme-btn-dash pull-right">Order Now</a> </div>
                                   {else}
-                                    <div class="price-btn-block"> <span class="price">Rs <strike>{$data.$a.price}</strike> {$data.$a.sprice}</span> <a href="#" class="btn theme-btn-dash pull-right">Order Now</a> </div>
+                                    <div class="price-btn-block"> <span class="price">Rs <strike>{$data.$a.price}</strike> {$data.$a.sprice}</span> <a href="/order_food" class="btn theme-btn-dash pull-right">Order Now</a> </div>
                                   {/if}
                                 </div>
                             </div>
@@ -180,33 +183,7 @@
             </div>
         </section>
         <!-- Featured restaurants ends -->
-        <section class="app-section">
-            <div class="app-wrap">
-                <div class="container">
-                    <div class="row text-img-block text-xs-left">
-                        <div class="container">
-                            <div class="col-xs-12 col-sm-5 right-image text-center">
-                                <figure> <img src="images/app.png" alt="Right Image" class="img-fluid"> </figure>
-                            </div>
-                            <div class="col-xs-12 col-sm-7 left-text">
-                                <h3>The Best Food Delivery App</h3>
-                                <p>Now you can make food happen pretty much wherever you are thanks to the free easy-to-use Food Delivery &amp; Takeout App.</p>
-                                <div class="social-btns">
-                                    <a href="#" class="app-btn apple-button clearfix">
-                                        <div class="pull-left"><i class="fa fa-apple"></i> </div>
-                                        <div class="pull-right"> <span class="text">Available on the</span> <span class="text-2">App Store</span> </div>
-                                    </a>
-                                    <a href="#" class="app-btn android-button clearfix">
-                                        <div class="pull-left"><i class="fa fa-android"></i> </div>
-                                        <div class="pull-right"> <span class="text">Available on the</span> <span class="text-2">Play store</span> </div>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        
         {include file="user-footer.tpl"}
     </div>
    {include file="js-version-for-user.tpl"}

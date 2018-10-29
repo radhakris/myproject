@@ -1,17 +1,17 @@
-<?php /* Smarty version Smarty-3.1.12, created on 2018-09-11 18:08:06
+<?php /* Smarty version Smarty-3.1.12, created on 2018-09-29 06:11:13
          compiled from "/home/shorthu4/public_html_secure/templates/web/add-apartment.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:9046641485b9804860ae121-95475169%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:19675936445baf1781181365-86650294%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     'd3401a92d80db9c62f1f666f26c74579f71da556' => 
     array (
       0 => '/home/shorthu4/public_html_secure/templates/web/add-apartment.tpl',
-      1 => 1536689267,
+      1 => 1536736287,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '9046641485b9804860ae121-95475169',
+  'nocache_hash' => '19675936445baf1781181365-86650294',
   'function' => 
   array (
   ),
@@ -23,9 +23,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.12',
-  'unifunc' => 'content_5b98048610e8e1_72442474',
+  'unifunc' => 'content_5baf1781224092_96087736',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5b98048610e8e1_72442474')) {function content_5b98048610e8e1_72442474($_smarty_tpl) {?><!DOCTYPE html>
+<?php if ($_valid && !is_callable('content_5baf1781224092_96087736')) {function content_5baf1781224092_96087736($_smarty_tpl) {?><!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -36,12 +36,8 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   <meta name="keyword" content="">
   <!--<link rel="shortcut icon" href="img/favicon.png">-->
 
-  <title>Admin Panel</title>
-  <link href="/beautify/adm/bootstrap.min.css" rel="stylesheet">
-  <link href="/beautify/adm/bootstrap-theme.css" rel="stylesheet">
-  <link href="/beautify/adm/elegant-icons-style.css" rel="stylesheet" />
-  <link href="/beautify/adm/font-awesome.min.css" rel="stylesheet" />
-  <link href="/beautify/adm/style.css" rel="stylesheet">
+  <?php echo $_smarty_tpl->getSubTemplate ("css-version-for-admin.tpl", $_smarty_tpl->cache_id, $_smarty_tpl->compile_id, null, null, array(), 0);?>
+
 </head>
 
 <body>
@@ -49,52 +45,8 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   <section id="container" class="">
 
 
-    <header class="header dark-bg">
-      <div class="toggle-nav">
-        <div class="icon-reorder tooltips" data-original-title="Toggle Navigation" data-placement="bottom"><i class="icon_menu"></i></div>
-      </div>
+    <?php echo $_smarty_tpl->getSubTemplate ("admin-top.tpl", $_smarty_tpl->cache_id, $_smarty_tpl->compile_id, null, null, array(), 0);?>
 
-      <!--logo start-->
-      <a href="index.html" class="logo">Nice <span class="lite">Admin</span></a>
-      <!--logo end-->
-
-      <div class="nav search-row" id="top_menu">
-        <!--  search form start -->
-        <ul class="nav top-menu">
-          <li>
-            <form class="navbar-form">
-              <input class="form-control" placeholder="Search" type="text">
-            </form>
-          </li>
-        </ul>
-        <!--  search form end -->
-      </div>
-
-      <div class="top-nav notification-row">
-        <!-- notificatoin dropdown start-->
-        <ul class="nav pull-right top-menu">
-          <!-- user login dropdown start-->
-          <li class="dropdown">
-            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                           
-                            <span class="username"><?php echo $_SESSION['user_name'];?>
-</span>
-                            <b class="caret"></b>
-                        </a>
-            <ul class="dropdown-menu extended logout">
-              <div class="log-arrow-up"></div>
-              
-              <li>
-                <a href="javascript:" onclick="logout();"><i class="icon_key_alt"></i> Log Out</a>
-              </li>
-             
-            </ul>
-          </li>
-          <!-- user login dropdown end -->
-        </ul>
-        <!-- notificatoin dropdown end-->
-      </div>
-    </header>
     <!--header end-->
 
     <!--sidebar start-->
@@ -211,9 +163,8 @@ $_smarty_tpl->tpl_vars['a']->first = $_smarty_tpl->tpl_vars['a']->iteration == 1
   <!-- container section start -->
 
   <!-- javascripts -->
-  <script src="/jlogic/adm/jquery-1.8.3.min.js"></script>
-  <script src="/jlogic/adm/bootstrap.min.js"></script>
-  <script src="/jlogic/adm/healthy.js"></script>
+  <?php echo $_smarty_tpl->getSubTemplate ("js-version-for-admin.tpl", $_smarty_tpl->cache_id, $_smarty_tpl->compile_id, null, null, array(), 0);?>
+
 
 </body>
 

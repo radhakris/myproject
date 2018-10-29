@@ -81,6 +81,12 @@ class adminPage extends common
 			case 'admin_save_menu':
 				$this->saveMenu();
 			break;
+			case 'admin_save_park':
+				$this->savePark();
+			break;
+			case 'admin_save_company':
+				$this->saveCompany();
+			break;
 			case 'admin_delete_menu':
 				$this->deleteMenu();
 			break;
@@ -93,11 +99,17 @@ class adminPage extends common
 			case 'admin_fetch_menu_ondate':
 				$this->fetchMenuOndate();
 			break;
+			case 'fetch_company':
+				$this->fetchCompany();
+			break;
 			case 'admin_save_todaymenu':
 				$this->saveTodayMenu();
 			break;
 			case 'admin_delete_todaymenu':
 				$this->deleteTodayMenu();
+			break;
+			case 'admin_upload_item_image':
+				$this->uploadItemImage();
 			break;
 		}
 	}
@@ -207,8 +219,29 @@ class adminPage extends common
 			$corp_types=$result->fetchAll();
 			$smarty->assign('corp_types', $corp_types);
 
+			$result_p=$this->dbConn->query("select * from it_parks where status=1");
+			$it_parks=$result_p->fetchAll();
+			$smarty->assign('it_parks', $it_parks);
+			
+			$result_c=$this->dbConn->query("select * from corp_company_names where status=1");
+			$it_comp=$result_c->fetchAll();
+			$smarty->assign('it_comp', $it_comp);
+
 			$result=$this->dbConn->query("select * from corporate c inner join corporate_types ct on c.corp_type=ct.id where c.status=1");
 			$row=$result->fetchAll();
+			for($j=0;$j<count($row);$j++){
+				$type=$row[$j]['corp_name'];
+				$it=$row[$j]['it_park_name'];
+				$resultcop=$this->dbConn->query("select company_name from corp_company_names where id=$type and status=1");
+				$rowcomp=$resultcop->fetch();
+				if(!empty($it)){
+					$resultit=$this->dbConn->query("select park_name from it_parks where id=$it and status=1");
+					$rowit=$resultit->fetch();
+				}
+				$row[$j]['corp_name']=$rowcomp['company_name'];
+				$row[$j]['it_park_name']=$rowit['park_name'];
+				unset($rowit);unset($rowcomp);
+			}
 			$this->getCounts($smarty);
 			$smarty->assign('data', $row);
 			echo $smarty->fetch($file_name,$cache_key);
@@ -225,6 +258,19 @@ class adminPage extends common
 
 			$result=$this->dbConn->query("select * from corporate c inner join corporate_types ct on c.corp_type=ct.id where c.status=1");
 			$row=$result->fetchAll();
+			for($j=0;$j<count($row);$j++){
+				$type=$row[$j]['corp_name'];
+				$it=$row[$j]['it_park_name'];
+				$resultcop=$this->dbConn->query("select company_name from corp_company_names where id=$type and status=1");
+				$rowcomp=$resultcop->fetch();
+				if(!empty($it)){
+					$resultit=$this->dbConn->query("select park_name from it_parks where id=$it and status=1");
+					$rowit=$resultit->fetch();
+				}
+				$row[$j]['corp_name']=$rowcomp['company_name'];
+				$row[$j]['it_park_name']=$rowit['park_name'];
+				unset($rowit);unset($rowcomp);
+			}
 			$this->getCounts($smarty);
 			$smarty->assign('data', $row);
 			echo $smarty->fetch($file_name,$cache_key);
@@ -351,6 +397,7 @@ class adminPage extends common
 		$item_prize=trim($_POST['item_prize']);
 		$item_sprize=trim($_POST['item_sprize']);
 		$item_quantity=trim($_POST['item_quantity']);
+		$sel_img=trim($_POST['sel_img']);
 		if(!$mid){
 			$aggr_fields[] = "type";
 			$aggr_fields[] = "name";
@@ -358,6 +405,7 @@ class adminPage extends common
 			$aggr_fields[] = "sprice";
 			$aggr_fields[] = "added_date";
 			$aggr_fields[] = "quantity";
+			$aggr_fields[] = "image";
 	
 			$aggr_values[] = $menutype;
 			$aggr_values[] = $item_name;
@@ -365,6 +413,7 @@ class adminPage extends common
 			$aggr_values[] = $item_sprize;
 			$aggr_values[] = date('Y-m-d H:i:s');
 			$aggr_values[] = $item_quantity;
+			$aggr_values[] = $sel_img;
 			$bool  = $this->dbConn->insert('items',$aggr_fields,$aggr_values);
 			echo '1';
 		}else{
@@ -374,6 +423,7 @@ class adminPage extends common
 			$aggr_fields[] = "sprice";
 			$aggr_fields[] = "modified_date";
 			$aggr_fields[] = "quantity";
+			$aggr_fields[] = "image";
 	
 			$aggr_values[] = $menutype;
 			$aggr_values[] = $item_name;
@@ -381,8 +431,57 @@ class adminPage extends common
 			$aggr_values[] = $item_sprize;
 			$aggr_values[] = date('Y-m-d H:i:s');
 			$aggr_values[] = $item_quantity;
+			$aggr_values[] = $sel_img;
 			$where= " id=".$mid;
 			$bool  = $this->dbConn->update('items',$aggr_fields,$aggr_values,$where);
+			echo '1';
+		}
+	}
+	private function savePark(){
+		$pid = trim($_POST['pid']);
+		$park_name = trim($_POST['parkk_name']);
+		if(!$mid){
+			$aggr_fields[] = "park_name";
+			$aggr_fields[] = "status";
+			$aggr_fields[] = "added_date";
+	
+			$aggr_values[] = $park_name;
+			$aggr_values[] = "1";
+			$aggr_values[] = date('Y-m-d H:i:s');
+			$bool  = $this->dbConn->insert('it_parks',$aggr_fields,$aggr_values);
+			echo '1';
+		}else{
+			$aggr_fields[] = "park_name";
+
+			$aggr_values[] = $park_name;
+			$where= " id=".$pid;
+			$bool  = $this->dbConn->update('it_parks',$aggr_fields,$aggr_values,$where);
+			echo '1';
+		}
+	}
+	private function saveCompany(){
+		$cid = trim($_POST['cid']);
+		$pid = trim($_POST['it_p_id']);
+		$companyy_name = trim($_POST['companyy_name']);
+		if(!$cid){
+			$aggr_fields[] = "pid";
+			$aggr_fields[] = "company_name";
+			$aggr_fields[] = "status";
+			if($pid=="")
+			{
+				$pid = 0;
+			}
+			$aggr_values[] = $pid;
+			$aggr_values[] = $companyy_name;
+			$aggr_values[] = "1";
+			$bool  = $this->dbConn->insert('corp_company_names',$aggr_fields,$aggr_values);
+			echo '1';
+		}else{
+			$aggr_fields[] = "company_name";
+
+			$aggr_values[] = $companyy_name;
+			$where= " id=".$cid;
+			$bool  = $this->dbConn->update('corp_company_names',$aggr_fields,$aggr_values,$where);
 			echo '1';
 		}
 	}
@@ -404,6 +503,21 @@ class adminPage extends common
 		$result=$this->dbConn->query("select * from items where id=".$id);
 		$row=$result->fetch();
 		echo json_encode($row);
+	}
+	private function fetchCompany(){
+		$id=$_REQUEST['id'];
+		$corp_type = $_REQUEST['corp_type'];
+		if($corp_type=="2")
+		{
+			$id=0;
+		}
+		$result=$this->dbConn->query("select * from corp_company_names where pid=".$id);
+		$row=$result->fetchAll();
+		$op='<option value="">Please select Company Name</option>';
+		foreach ($row as $key => $value) {
+			$op.='<option value="'.$value['id'].'">'.$value['company_name'].'</option>';
+		}
+		echo $op;
 	}
 	private function fetchMenuOndate(){
 		$date=$_REQUEST['date'];
@@ -506,6 +620,60 @@ class adminPage extends common
 			exit('Something Wrong');
 		}
 	}
+	private function uploadItemImage(){
+		$msg = "";
+		$valid_formats = array("jpg", "jpeg","png");
+		if(isset($_POST) and $_SERVER['REQUEST_METHOD'] == "POST"){
+			$_FILES['article_img'] = $_FILES['file'];
+			$pathinfo = pathinfo($_FILES['article_img']['name']);
+			$name_with_real_ext = str_replace(".",'-',$pathinfo['filename']).".".$pathinfo['extension'];
+
+			$name = strtolower(str_replace(array(' ','_'),array('','-'),$name_with_real_ext));
+			$name = preg_replace('@[^a-z-_0-9\.]+@i','',$name);
+			$size = $_FILES['article_img']['size'];
+			$kbs = $fsize = $size/1024;
+			if($kbs >= 1024){
+				$fsize= round($kbs/1024);
+				$fsize.=" mb";
+			}else{
+				$fsize=round($fsize)." kb";
+			}
+				$temp_name=$tmp = $_FILES['article_img']['tmp_name'];
+				list($width, $height)= getimagesize($tmp);
+				$max_width =  150;
+				$max_height =  150;
+				$imagename=$pathinfo['filename']."-".time().".".$pathinfo['extension'];
+				if(strlen($name)){
+				//echo $name."---------";
+				$ext = strtolower(substr($name,strrpos($name,'.',-1)+1));
+				if(in_array(strtolower($ext),$valid_formats)){
+					//if($size<(300*1024)){
+					//if(($width == $max_width && $height == $max_height)){
+					$this->postedValue['info']['image_name'] = $tmp;
+						$sourcefile = $this->postedValue['info']['image_name'];
+						$setting_path = $GLOBALS['CONF']['BASE_FOLDER_PATH'].'/img/';
+						$target_path = $setting_path.$imagename;
+						//echo $target_path."-----------------";
+						//var_dump(move_uploaded_file($temp_name, $target_path));
+						if(move_uploaded_file($temp_name, $target_path)) {
+							echo $msg = $imagename;
+						}
+					if($msg!=''){
+						$msg = $msg ;
+					}else
+						$err = "failed";
+					//}else
+							//$err = "Image should be equal to 150x150.";
+					//}else
+					//        $err = "Size should be < 100 KB";
+				}else
+						$err = "Invalid image format..";
+				}else
+						$err = "Please select image..!";
+				echo $err."::".$msg."::".$width."x".$height;
+				exit;
+		}
+	}
 	private function showDashboard(){
 		if(!empty($_SESSION['user_id'])){
 			$cache_key      = $this->deviceType."_admindash";
@@ -532,7 +700,6 @@ class adminPage extends common
 		} 
 		return $temp;
 	}
-        
 	public function getCounts($smarty){
 		//for apartment count start
 		$result=$this->dbConn->query("select count(*) as acnt from appartment where status=1");

@@ -1,25 +1,25 @@
-<?php /* Smarty version Smarty-3.1.12, created on 2018-09-11 18:08:11
+<?php /* Smarty version Smarty-3.1.12, created on 2018-10-28 08:57:44
          compiled from "/home/shorthu4/public_html_secure/templates/web/login.tpl" */ ?>
-<?php /*%%SmartyHeaderCode:8495830875b98048b933728-16263346%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
+<?php /*%%SmartyHeaderCode:15870376155bd57a08434c81-70329540%%*/if(!defined('SMARTY_DIR')) exit('no direct access allowed');
 $_valid = $_smarty_tpl->decodeProperties(array (
   'file_dependency' => 
   array (
     'dcc6afad018482ac228fd6f8cad1027b4f446e4e' => 
     array (
       0 => '/home/shorthu4/public_html_secure/templates/web/login.tpl',
-      1 => 1536678706,
+      1 => 1536736514,
       2 => 'file',
     ),
   ),
-  'nocache_hash' => '8495830875b98048b933728-16263346',
+  'nocache_hash' => '15870376155bd57a08434c81-70329540',
   'function' => 
   array (
   ),
   'has_nocache_code' => false,
   'version' => 'Smarty-3.1.12',
-  'unifunc' => 'content_5b98048b955f31_48483700',
+  'unifunc' => 'content_5bd57a084be4f0_08918795',
 ),false); /*/%%SmartyHeaderCode%%*/?>
-<?php if ($_valid && !is_callable('content_5b98048b955f31_48483700')) {function content_5b98048b955f31_48483700($_smarty_tpl) {?><!DOCTYPE html>
+<?php if ($_valid && !is_callable('content_5bd57a084be4f0_08918795')) {function content_5bd57a084be4f0_08918795($_smarty_tpl) {?><!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -30,12 +30,8 @@ $_valid = $_smarty_tpl->decodeProperties(array (
   <meta name="keyword" content="">
   <!--<link rel="shortcut icon" href="img/favicon.png">-->
 
-  <title>Admin Panel</title>
-  <link href="/beautify/adm/bootstrap.min.css" rel="stylesheet">
-  <link href="/beautify/adm/bootstrap-theme.css" rel="stylesheet">
-  <link href="/beautify/adm/elegant-icons-style.css" rel="stylesheet" />
-  <link href="/beautify/adm/font-awesome.min.css" rel="stylesheet" />
-  <link href="/beautify/adm/style.css" rel="stylesheet">
+  <?php echo $_smarty_tpl->getSubTemplate ("css-version-for-admin.tpl", $_smarty_tpl->cache_id, $_smarty_tpl->compile_id, null, null, array(), 0);?>
+
 </head>
 
 <body class="login-img3-body">
@@ -63,9 +59,9 @@ $_valid = $_smarty_tpl->decodeProperties(array (
 
 
 </body>
+<?php echo $_smarty_tpl->getSubTemplate ("js-version-for-admin.tpl", $_smarty_tpl->cache_id, $_smarty_tpl->compile_id, null, null, array(), 0);?>
 
-  <script src="/jlogic/adm/jquery-1.8.3.min.js"></script>
-  <script src="/jlogic/adm/bootstrap.min.js"></script>
+
   <script>
     function validateForm()
     {

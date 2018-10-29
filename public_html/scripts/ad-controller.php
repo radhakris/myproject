@@ -32,12 +32,12 @@ class controller {
 		////for preload
 
 			// module logic needs to be decided. 
-			$this->module = $_REQUEST['module']!='' ? $_REQUEST['module'] : 'article';
+			$this->module = $_REQUEST['module']!='' ? $_REQUEST['module'] : 'homepage';
 	}
 	public function init(){
 		$properties = $_GET;
 		$properties['deviceType'] = $this->deviceType;
-		if($this->deviceType=='phone'){exit('Mobile Site Under Construction, please check on Computer');}
+		//if($this->deviceType=='phone'){exit('Mobile Site Under Construction, please check on Computer');}
 		$properties['mobileOSType'] = $this->mobileOSType;
 		$properties['module'] = $this->module;
 		//var_dump($properties);
@@ -124,6 +124,16 @@ class controller {
 				$obj = new adminPage($properties);
 				$obj->init();
 			break;
+			case 'admin_save_park':
+				require_once('adminPage.php');
+				$obj = new adminPage($properties);
+				$obj->init();
+			break;
+			case 'admin_save_company':
+				require_once('adminPage.php');
+				$obj = new adminPage($properties);
+				$obj->init();
+			break;
 			case 'admin_delete_menu':
 				require_once('adminPage.php');
 				$obj = new adminPage($properties);
@@ -144,6 +154,21 @@ class controller {
 				$obj = new adminPage($properties);
 				$obj->init();
 			break;
+			case 'fetch_company':
+				require_once('adminPage.php');
+				$obj = new adminPage($properties);
+				$obj->init();
+			break;
+			case 'fetch_company_front':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+			case 'admin_upload_item_image':
+				require_once('adminPage.php');
+				$obj = new adminPage($properties);
+				$obj->init();
+			break;
 			case 'admin_save_todaymenu':
 				require_once('adminPage.php');
 				$obj = new adminPage($properties);
@@ -152,6 +177,53 @@ class controller {
 			case 'admin_delete_todaymenu':
 				require_once('adminPage.php');
 				$obj = new adminPage($properties);
+				$obj->init();
+			break;
+			case 'homepage':
+				require_once('homePage.php');
+				$obj = new homePage($properties);
+				$obj->init();
+			break;
+			case 'register':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+			case 'login':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+			case 'save_registration':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+
+			case 'check_login':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+
+			case 'profile':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+			case 'order_food':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+			case 'add-to-cart':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
+				$obj->init();
+			break;
+			case 'checkout':
+				require_once('userPage.php');
+				$obj = new userPage($properties);
 				$obj->init();
 			break;
 		}

@@ -59,10 +59,21 @@
               </div>
 
               <div class="form-group" id="it_park_display" style="display:none;">
-                <input type="text" name="it_park_name" class="form-control" id="it_park_name" placeholder="IT Park Name" required="required" />
+                <select class="form-control" name="it_park_name" id="it_park_name" onchange="displayCompany(this.value);">
+                    <option value="">Please select IT Park</option>
+                  {foreach from=$it_parks item=itt_parks name=itp}
+                    <option value="{$itt_parks.id}">{$itt_parks.park_name}</option>
+                  {/foreach}
+                </select> <a data-toggle="modal" class="btn btn-primary btn-sm" id="add_new_it_park" href="#myModalPark" style="margin-top: 10px;">Add</a>
               </div>
               <div class="form-group">
-                <input type="text" name="cname" class="form-control" id="cname" placeholder="Company Name" required="required" />
+                <select class="form-control" name="cname" id="cname">
+                  <option value="">Please select Company Name</option>
+                  {foreach from=$it_comp item=it_compi name=itpc}
+                    <option value="{$it_compi.id}">{$it_compi.company_name}</option>
+                  {/foreach}
+                </select>
+                <a data-toggle="modal" class="btn btn-primary btn-sm" id="add_new_company" href="#myModalCompany" style="display:none;">Add</a>
               </div>
               <div class="form-group">
                 <textarea class="form-control" name="caddress" id="caddress" rows="5" data-rule="required" placeholder="Company Address"></textarea>
@@ -123,6 +134,45 @@
           </div>
         </div>
         <!--/.row-->
+        <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModalPark" class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+                  <h4 class="modal-title">Add IT Park Name</h4>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post" role="form" id="admenuitems">
+                  <div class="form-group">
+                    <input type="text" name="parkk_name" class="form-control" id="parkk_name" placeholder="Company Name" required="required" autocomplete="off"/>
+                  </div>
+                  <div id="statusdivIt"></div>
+                  <div class="text-center"><button id="saveIt" type="button" class="btn btn-primary btn-lg" onclick="addNewPark()">Save</button></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModalCompany" class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                  <button aria-hidden="true" data-dismiss="modal" class="close" type="button">x</button>
+                  <h4 class="modal-title">Add Company Name</h4>
+              </div>
+              <div class="modal-body">
+                <form action="" method="post" role="form" id="adcompanynames">
+                  <input type="hidden" id="it_p_id" name="it_p_id" value="">
+                  <div class="form-group">
+                    <input type="text" name="companyy_name" class="form-control" id="companyy_name" placeholder="Company Name" required="required" autocomplete="off"/>
+                  </div>
+                  <div id="statusdivcmny"></div>
+                  <div class="text-center"><button id="savecmpny" type="button" class="btn btn-primary btn-lg" onclick="addNewCompany()">Save</button></div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
       
     </section>
@@ -132,6 +182,88 @@
 
   <!-- javascripts -->
   {include file="js-version-for-admin.tpl"}
+  {literal}
+  <script>
+  function displayItPark(id)
+  {
+      if(id==1)
+      {
+          $("#it_park_display").show();
+      }
+      else
+      {
+          $("#it_park_display").hide();
+          displayCompany();
+      }
+  }
+  function addNewPark(){
+      if($("#parkk_name").val()==''){
+        $("#statusdivIt").html('Please Enter IT Park name..');
+        return false;
+      }
+      $("#saveIt").html('Please Wait..');
+    $.ajax({
+            type: "POST",
+            url: "/scripts/ad-controller.php?module=admin_save_park",
+            beforeSend: function(xhr){xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");},
+            data: $("#admenuitems").serialize(),
+            success: function(result) {
+                var res = result.split(":");
+                if(res[0]==1){
+                  var cdomain=window.location.host;
+                  cdomain='http://'+cdomain+"/admin-add-corporate";
+                  window.location.href=cdomain;
+                }
+            },
+            error: function(result) {
+                
+            }
+        });
+  }
+  function addNewCompany(){
+      var it_p_val = $("#it_park_name").val();
+      $("#it_p_id").val(it_p_val);
+      if($("#companyy_name").val()==''){
+        $("#statusdivcmny").html('Please Enter Company name..');
+        return false;
+      }
+      $("#savecmpny").html('Please Wait..');
+    $.ajax({
+            type: "POST",
+            url: "/scripts/ad-controller.php?module=admin_save_company",
+            beforeSend: function(xhr){xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");},
+            data: $("#adcompanynames").serialize(),
+            success: function(result) {
+                var res = result.split(":");
+                if(res[0]==1){
+                  var cdomain=window.location.host;
+                  cdomain='http://'+cdomain+"/admin-add-corporate";
+                  window.location.href=cdomain;
+                }
+            },
+            error: function(result) {
+                
+            }
+        });
+  }
+  function displayCompany(pid){
+    $("#add_new_company").show();
+    var corp_type = $("#corp_type").val();
+    $.ajax({
+            type: "POST",
+            url: "/scripts/ad-controller.php?module=fetch_company&id="+pid+"&corp_type="+corp_type,
+            beforeSend: function(xhr){xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");},
+            data: pid,
+            success: function(result) {
+                $("#cname").html(result);
+            },
+            error: function(result) {
+                
+            }
+        });
+  }
+  </script>
+  {/literal}
 
 </body>
 

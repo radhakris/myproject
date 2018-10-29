@@ -4,16 +4,22 @@ require_once('Database.php');
 require_once('Mysql.php');
 require_once('common.php');
 require_once('sanitise.php');
+if($_REQUEST['test']==1)
+{
+	error_reporting(E_ALL);
+	ini_set('display_errors', 1);
+}
 ini_set('magic_quotes_gpc','off');
 if(get_magic_quotes_gpc()) {
         function stripslashes_gpc(&$value){
                 $value = stripslashes($value);
         }
         array_walk_recursive($_GET, 'stripslashes_gpc');
-        array_walk_recursive($_POST, 'stripslashes_gpc');
+        array_walk_recursive($_REQUEST, 'stripslashes_gpc');
         array_walk_recursive($_COOKIE, 'stripslashes_gpc');
         array_walk_recursive($_REQUEST, 'stripslashes_gpc');
 }
+
 class userPage extends common
 {
 	private $postedValue;
@@ -31,178 +37,270 @@ class userPage extends common
 		$this->dbConn       = includes_Mysql::getInstance();
 	}
 	public function init() {
-		//var_dump($this->postedValue);
-		$type = $this->postedValue['module'];	
+		$type = $this->postedValue['module'];
 		switch($type){
 			case 'register':
-				$this->loadRegPage();
-			break;
-			case 'register-user':
-				$this->saveRegPage();
+				$this->registerPage();
 			break;
 			case 'login':
-				$this->loadLoginPage();
+				$this->loginPage();
 			break;
-			case 'login-user':
+			case 'profile':
+				$this->profilePage();
+			break;
+			case 'check_login':
 				$this->checkLogin();
-			break; 
+			break;
+			case 'fetch_company_front':
+				$this->fetchCompanyFront();
+			break;
+			case 'save_registration':
+				$this->save_registration();
+			break;
+			case 'order_food':
+				$this->orderFood();
+			break;
+			case 'add-to-cart':
+				$this->addToCart();
+			break;
+			case 'checkout':
+				$this->checkOut();
+			break;
 		}
 	}
-	private function saveRegPage(){
-		if( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && ( $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' ) )
-		{
-			$sql = $this->dbConn->query("SELECT uid FROM coco_user WHERE email='".trim($_POST['email'])."' limit 1");
-                        $res = $sql->fetch(PDO::FETCH_ASSOC);
-			if(empty($res['uid'])){
-				$firstname=$_POST['firstname'];
-				$lastname=$_POST['lastname'];
-				$phonenumber=$_POST['phonenumber'];
-				$email = $_POST['email'];
-				$password=md5($_POST['password']);
-				$ip_address = $this->getLocalIPAddress();
-				if($ip_address['pip_address'] !="")
-					$loggedipadd = $ip_address['pip_address'];
-				else
-					$loggedipadd = $ip_address['ip_address'];
-				$aggr_fields[] = "first_name";
-				$aggr_fields[] = "last_name";
-				$aggr_fields[] = "email";
-				$aggr_fields[] = "phone_number";
-				$aggr_fields[] = "password";
-				$aggr_fields[] = "ip_address";
-				$aggr_fields[] = "status";
-		
-				$aggr_values[] = $firstname;
-				$aggr_values[] = $lastname;
-				$aggr_values[] = $email;
-				$aggr_values[] = $phonenumber;
-				$aggr_values[] = $password;
-				$aggr_values[] = $loggedipadd;
-				$aggr_values[] = 1;
-				$bool  = $this->dbConn->insert('coco_user',$aggr_fields,$aggr_values);
-				echo "1:Successfully Registered.";
-			}else{
-				echo "0:This Email Is Already Registered With Us.";
-			}
-		}else{
-			exit('Something Wrong');
-		}
-	}
-	private function loadRegPage(){
-		$cache_key      = $this->deviceType."_register";
+
+	private function registerPage(){
+		$cache_key      = $this->deviceType."_regipage";
 		$file_name = 'register.tpl';
 		$smarty       = $this->checkSmartyCache($cache_key,$file_name,0);
-		//var_dump($smarty);
+		$result=$this->dbConn->query("select * from appartment where status=1");
+		$row=$result->fetchAll();
+		$smarty->assign('apartment_data', $row);
+		$result_it=$this->dbConn->query("select * from it_parks where status=1");
+		$row_it=$result_it->fetchAll();
+		$smarty->assign('it_data', $row_it);
+
+		$result_ind=$this->dbConn->query("select * from corp_company_names where pid=0");
+		$row_ind=$result_ind->fetchAll();
+		$smarty->assign('ind_com_data', $row_ind);
 		echo $smarty->fetch($file_name,$cache_key);
 	}
-	private function loadLoginPage(){
-		$cache_key      = $this->deviceType."_login";
+
+	private function loginPage(){
+		$cache_key      = $this->deviceType."_loginpage";
 		$file_name = 'login.tpl';
-		//exit('ffff');
 		$smarty       = $this->checkSmartyCache($cache_key,$file_name,0);
-		
+		/*$result=$this->dbConn->query("select * from appartment where status=1");
+		$row=$result->fetchAll();*/
+		echo $smarty->fetch($file_name,$cache_key);
+	}
+	private function profilePage(){
+		$cache_key      = $this->deviceType."_profilepage";
+		$file_name = 'profile.tpl';
+		$smarty       = $this->checkSmartyCache($cache_key,$file_name,0);
+		if($_SESSION['user_id']!="" && $_SESSION['user_name']!="")
+		{
+			$smarty->assign('sess_user_id', $_SESSION['user_id']);
+			$smarty->assign('sess_user_name', $_SESSION['user_name']);
+		}
+		/*$result=$this->dbConn->query("select * from appartment where status=1");
+		$row=$result->fetchAll();*/
 		echo $smarty->fetch($file_name,$cache_key);
 	}
 	private function checkLogin(){
-		if( isset( $_SERVER['HTTP_X_REQUESTED_WITH'] ) && ( $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest' ) )
-		{
-			$email = trim($_POST['email']);
-			echo $_POST['password'];
-			$password=md5(trim($_POST['password']));
-			echo $email;
-			echo $password;
-			if(!empty($email) && !empty($password)){
-				$condition  = "email = '".$email."' and password ='".$password."' and status =1";
-				$table      = 'coco_user';
-				$fields     = 'first_name,last_name,uid,email,status';
-				$result     = $this->dbConn->select($fields,$table,$condition,'','',0,1);
-				var_dump($result);
-				$row=$result->fetchAll();
-				if(empty($row) || $error==1)
-				{
-					$ip_address = $this->getLocalIPAddress();
-					if($ip_address['pip_address'] !="")
-						$loggedipadd = $ip_address['pip_address'];
-					else
-						$loggedipadd = $ip_address['ip_address'];
-					$aggr_fields[] = "ip_address";
-					$aggr_values[] = $loggedipadd;
-					$bool  = $this->dbConn->insert('coco_check_brutal',$aggr_fields,$aggr_values);
-					exit('0:Please enter Valid User name and Password');	
-				}else{
-					if($row[0]['status']==0){
-					exit('Please activate the account');
-					}else{
-					$_SESSION['user_name']=$row[0]['first_name'].' '.$row[0]['last_name'];
-					$_SESSION['email']=$row[0]['email'];
-					$_SESSION['user_id']=$row[0]['uid'];
-					echo "1:Please Wiat.";
-					var_dump($_SESSION);
-					}
-				}
-			}else{
-				exit('0:Please Enter Both Email and Password.');
+		$email_id = trim($_REQUEST['login_email']);
+		$password = trim($_REQUEST['login_password']);
+
+		$result=$this->dbConn->query("select * from aahar_users where email='".$email_id."' and password='".$password."'");
+		$row=$result->fetchAll();
+		if(count($row)>0)
+		{		
+			foreach ($row as $key => $value) {
+				$user_id = $value['user_id'];
+				$user_name = $value['first_name'];
 			}
+			session_start();
+			$_SESSION['user_id'] = $user_id;
+			$_SESSION['user_name'] = $user_name;
+			echo 'success';
+		}
+		else
+		{
+			echo "The Username or password you entered is incorrect.";
+		}
+		exit;
+		
+	}
+
+	private function fetchCompanyFront(){
+		$id=$_REQUEST['id'];
+		$corp_type = $_REQUEST['corp_type'];
+		if($corp_type=="2")
+		{
+			$id=0;
+		}
+		$result=$this->dbConn->query("select * from corp_company_names where pid=".$id);
+		$row=$result->fetchAll();
+		$op='<option value="">Please select Company Name</option>';
+		foreach ($row as $key => $value) {
+			$op.='<option value="'.$value['id'].'">'.$value['company_name'].'</option>';
+		}
+		echo $op;
+	}
+	private function save_registration(){
+		$uid = trim($_REQUEST['uid']);
+		if(!$uid && $_REQUEST['email_id']!="")
+		{
+			$email_id = trim($_REQUEST['email_id']);
+			$check_email = $this->dbConn->query("select * from aahar_users where email='".$email_id."'");
+			$row=$check_email->fetchAll();
+			if(count($row)>0)
+			{
+				echo "Email Id Already Existed.Please Login To Continue.";
+				exit;
+			}
+		}
+		$user_type = trim($_REQUEST['reg_type']);
+		$apartment_id = trim($_REQUEST['apartment_name']);
+		$it_park_id = trim($_REQUEST['it_park_name']);
+		$company_id = trim($_REQUEST['it_company_name']);
+		$first_name = trim($_REQUEST['first_name']);
+		$last_name = trim($_REQUEST['last_name']);
+		$email=trim($_REQUEST['email_id']);
+		$password=trim($_REQUEST['password']);
+		$mobile=trim($_REQUEST['mobile_number']);
+		$status=1;
+		if($user_type=="it_park")
+		{
+			$user_type=1;
+		}
+		elseif($user_type=="non_it_park")
+		{
+			$user_type=2;
+		}
+		else
+		{
+			$user_type=3;
+		}
+		if(!$cid){
+			$aggr_fields[] = "first_name";
+			$aggr_fields[] = "last_name";
+			$aggr_fields[] = "email";
+			$aggr_fields[] = "password";
+			$aggr_fields[] = "mobile";
+			$aggr_fields[] = "user_type";
+			$aggr_fields[] = "it_park_id";
+			$aggr_fields[] = "company_id";
+			$aggr_fields[] = "apartment_id";
+			$aggr_fields[] = "status";
+			$aggr_fields[] = "added_date";
+	
+			$aggr_values[] = $first_name;
+			$aggr_values[] = $last_name;
+			$aggr_values[] = $email;
+			$aggr_values[] = $password;
+			$aggr_values[] = $mobile;
+			$aggr_values[] = $user_type;
+			$aggr_values[] = $it_park_id;
+			$aggr_values[] = $company_id;
+			$aggr_values[] = $apartment_id;
+			$aggr_values[] = $status;
+			$aggr_values[] = date('Y-m-d H:i:s');
+			$bool  = $this->dbConn->insert('aahar_users',$aggr_fields,$aggr_values);
+			echo 'success';
 		}else{
-			exit('Something Wrong');
+			$aggr_fields[] = "corp_type";
+			$aggr_fields[] = "it_park_name";
+			$aggr_fields[] = "corp_name";
+			$aggr_fields[] = "corp_address";
+			$aggr_fields[] = "corp_city";
+			$aggr_fields[] = "corp_state";
+			$aggr_fields[] = "corp_zip";
+			$aggr_fields[] = "corp_modified_date";
+	
+			$aggr_values[] = $ctype;
+			$aggr_values[] = $it_park_name;
+			$aggr_values[] = $cname;
+			$aggr_values[] = $caddress;
+			$aggr_values[] = $ccity;
+			$aggr_values[] = $cstate;
+			$aggr_values[] = $czip;
+			$aggr_values[] = date('Y-m-d H:i:s');
+			$where= " corp_id=".$cid;
+			$bool  = $this->dbConn->update('aahar_users',$aggr_fields,$aggr_values,$where);
+			echo '1';
 		}
 	}
-	
-	public function getLocalIPAddress()
-	{
-		$temp = array();
-		if (getenv(HTTP_X_FORWARDED_FOR)) {
-			$pipaddress = getenv(HTTP_X_FORWARDED_FOR);
-			$ipaddress = getenv(REMOTE_ADDR);
-			$temp['pip_address'] = $pipaddress;
-			$temp['ip_address'] = $ipaddress;
-		} else {
-			$ipaddress = getenv(REMOTE_ADDR);
-			$temp['ip_address'] = $ipaddress;
-		} 
-		return $temp;
+	private function orderFood(){
+		$sel_date=$_REQUEST['sel_date'];
+		$tomorrow=date('Y-m-d',strtotime("+1 days"));
+		$weekDay = date('w', strtotime($tomorrow));
+		$weekarray=array();
+		$weektdate=$tomorrow;
+		for($i = 0; $i < 7; $i++){
+			$weekday = date('l', strtotime($weektdate));
+			$weekarray[]=array('day'=>$weekday,'date'=>$weektdate);
+			$weektdate=date('Y-m-d', strtotime($weektdate . ' +1 day'));
+		}
+		$cache_key      = $this->deviceType."_order_food".$tomorrow;
+		$file_name = 'order_food.tpl';
+		$smarty       = $this->checkSmartyCache($cache_key,$file_name,0);
+		//$sql="select A.*,B.name from items_open as A,items as B where A.item_id=B.id and A.sale_date='".$tomorrow."' and A.status=1";
+		$cart_date=$tomorrow;
+		if(!empty($sel_date)){
+			//$sql="select A.*,B.name from items_open as A,items as B where A.item_id=B.id and A.sale_date='".$sel_date."' and A.status=1";
+			$cart_date=$sel_date;
+		}
+		$sql="select *,id as item_id from items where status=1";
+		$result=$this->dbConn->query($sql);
+		$row=$result->fetchAll();
+		//$sqlcn = $this->dbConn->query("SELECT count(cid) as cnt FROM aahar_cart WHERE user='".$_SESSION['user_id']."'");
+		$sqlcn = $this->dbConn->query("SELECT count(cid) as cnt FROM aahar_cart WHERE user=1");
+		$listcn = $sqlcn->fetch(PDO::FETCH_ASSOC);
+		$smarty->assign('data', $row);
+		$smarty->assign('days', $weekarray);
+		$smarty->assign('sel_date', $sel_date);
+		$smarty->assign('cart_date', $cart_date);
+		$smarty->assign('checkout', $listcn['cnt']);
+		echo $smarty->fetch($file_name,$cache_key);
 	}
-        private function sendresetlink()
-	{
-	    $username_ajax=$_GET['uname'];
-	    $sql_ajax_query = $this->dbConn->query("SELECT user_id,login_name,email from users where login_name='$username_ajax' limit 1");
-	    $res_ajax = $sql_ajax_query->fetch(PDO::FETCH_ASSOC);
-	    $user_id=$res_ajax['user_id'];
-	    $secret_key = "one_reset_1258$5%&";
-	    $iv=rand(10,1000);
-	    $ivenc=base64_encode($iv);
-	    $encrypted_string = openssl_encrypt($user_id,  'AES-128-CBC', $secret_key, OPENSSL_RAW_DATA, $iv);
-	    $encrypt_string = base64_encode($encrypted_string);
-	    if($user_id!=''){
-			 $this->objMailer 	= scripts_Mailer::createInstance();
-			$subject        = 'Password Reset Link';
-			$messagebody    = 'Hi '.$res_ajax['login_name'].',<br /><br /> Click on the below link to reset the password.<br /><br />';
-			$messagebody   .= '<a href = "http://jupiter.greynium.com/index.php?module=user&class=UserManagement&action=reset&tem='.$ivenc.'&link='. $encrypt_string .'">Click here..!</a><br/><br/>OR <br/><br/>';
-					    $messagebody   .= '<a href = "http://venus.greynium.com//index.php?module=user&class=UserManagement&action=reset&tem='.$ivenc.'&link='. $encrypt_string .'">Click here..!</a><br/><br/>';
-			$messagebody   .= '--------------------------<br/>Thanks & Regards,<br/><b>CMS Admin</b>';
-			$mailcontent = array("from"     => 'cms-support@oneindia.co.in',
-			"fromname" => 'CMS Admin',
-			"to"       => $res_ajax['email'],
-			"cc"       => 'cms-alerts@oneindia.co.in',
-			"toname"   => $res_ajax['login_name'],
-			"subject"  => $subject,
-			"body"     => $messagebody,
-			"mailtype" => 'html' );
-			$this->objMailer->sendMail($mailcontent);
-			unset($mailcontent);unset($subject);unset($messagebody);
-			echo "Password reset link sent to your email id..!";
-			header( "refresh:2;url=http://jupiter.greynium.com/index.php?module=user&class=UserManagement&action=login" );
-	     }
-	     else
-	     {
-		echo "Please provide correct username..!";
-		header( "refresh:2;url=http://jupiter.greynium.com/index.php?module=user&class=UserManagement&action=login" );
-	     }
-	
+	private function addToCart(){
+		$ref=$_SERVER['HTTP_REFERER'];
+		if(preg_match("@order_food@",$ref)){
+			$usrid=$_REQUEST['usrid'];
+			$date=$_REQUEST['date'];
+			$price=$_REQUEST['price'];
+			$item=$_REQUEST['item'];
+			$sqlch = $this->dbConn->query("SELECT cid FROM aahar_cart WHERE item =".$item." and date='".$date."' and user=".$usrid." limit 1");
+			$listch = $sqlch->fetch(PDO::FETCH_ASSOC);
+			if(empty($listch['cid']))
+			{
+				$aggr_fields[] = "item";
+				$aggr_fields[] = "date";
+				$aggr_fields[] = "price";
+				$aggr_fields[] = "user";
+						
+				$aggr_values[] = $item;
+				$aggr_values[] = $date;
+				$aggr_values[] = $price;
+				$aggr_values[] = $usrid;
+				$bool  = $this->dbConn->insert('aahar_cart',$aggr_fields,$aggr_values);
+			}
+			$sqlcn = $this->dbConn->query("SELECT count(cid) as cnt FROM aahar_cart WHERE user=".$usrid);
+			$listcn = $sqlcn->fetch(PDO::FETCH_ASSOC);
+			echo $listcn['cnt'];
+		}
 	}
-	
-	
-	
+	private function checkOut(){
+		$cache_key      = $this->deviceType."_order_food".$tomorrow;
+		$file_name = 'checkout.tpl';
+		$smarty       = $this->checkSmartyCache($cache_key,$file_name,0);
+		//$sqlcn = $this->dbConn->query("SELECT * FROM aahar_cart WHERE user='".$_SESSION['user_id']."'");
+		$sqlcn = $this->dbConn->query("SELECT * FROM aahar_cart WHERE user=1");
+		$listcn = $sqlcn->fetchAll(PDO::FETCH_ASSOC);
+		$smarty->assign('checkoutdata', $listcn);
+		echo $smarty->fetch($file_name,$cache_key);
+	}
 }//End of Class
 
 

@@ -8,7 +8,11 @@
   <meta name="author" content="GeeksLabs">
   <meta name="keyword" content="">
   <!--<link rel="shortcut icon" href="img/favicon.png">-->
-
+	{literal}
+	<script type="text/javascript" src="/jlogic/adm/plugins/uploader/js/plupload.full.min.js"></script>
+<script type="text/javascript" src="/jlogic/adm/plugins/uploader/js/moxie.js"></script>
+<script type="text/javascript" src="/jlogic/adm/plugins/uploader/js/plupload.dev.js"></script>
+	{/literal}
   {include file="css-version-for-admin.tpl"}
 </head>
 
@@ -156,15 +160,15 @@
 							 <div class="form-group">
                 <input type="text" name="item_quantity" class="form-control" id="item_quantity" placeholder="Quantity" required="required" autocomplete="off"/>
               </div>
-              <!--<div class="form-group">
-                {assign "counti" $data|@count}
-								<select name='free_item' id='free_item' class="form-control m-bot15">
-									<option value='0'>Select Free Item</option>
-									{for $c = 0 to $counti-1}
-										<option value='{$data.$c.id}'>{$data.$c.name}</option>
-									{/for}
-								</select>
-              </div>-->
+              <div class="form-group">
+                <div id="filelist">Your browser doesn't have Flash, Silverlight or HTML5 support.</div>
+								<div id="uploader_container">
+									<button id="pickfiles">Browse</button>
+								</div>
+								<label for="sel_img" class="cerror brws_vald_err" id="sel_img-error"></label>
+								<div id="img_preview"></div>
+								<input type="hidden" id="sel_img" name="sel_img" value="{$template.aggr_info.image}">
+              </div>
               <div id="statusdiv"></div>
               <div class="text-center"><button id="saveapartment" type="button" class="btn btn-primary btn-lg" onclick="addMenuItems()">Save</button></div>
             </form>
@@ -307,6 +311,84 @@ function dateChanged(ev) {
 					});
 			}
 		}
+</script>
+
+<script type="text/javascript">
+
+var uploader = new plupload.Uploader({
+	runtimes : 'html5,flash,silverlight,html4',
+	browse_button : 'pickfiles', // you can pass in id...
+	container: document.getElementById('uploader_container'), // ... or DOM Element itself
+	url : '/scripts/ad-controller.php?module=admin_upload_item_image&id=123',
+	flash_swf_url : '/jlogic/adm/plugins/uploader/js/Moxie.swf',
+	silverlight_xap_url : '/jlogic/adm/plugins/uploader/js/Moxie.xap',
+	multiple_queues : false,
+	multi_selection : false,
+	max_file_count: 1,
+
+	filters : {
+		max_file_size : '1mb',
+		mime_types: [
+			{title : "Image files", extensions : "jpg,jpeg,png"},
+			{title : "Zip files", extensions : "zip"}
+		]
+	},
+
+	init: {
+		PostInit: function() {
+			document.getElementById('filelist').innerHTML = '';
+		},
+		FilesAdded: function(up, files) {
+			plupload.each(files, function(file) {
+				$("#sel_img-error").html('').hide();
+				//if(document.getElementById('upload_percent')){
+				//	document.getElementById('upload_percent').innerHTML = '<img height="22px" width="100px" class="loader" src="/images/loader.gif" alt="Uploading...">';
+				//	//document.getElementById('ajax_loader').style.display= 'block';
+				//}
+				document.getElementById('img_preview').innerHTML ="<p>Uploading....</p>";
+				up.start();
+			});
+		},
+
+		UploadProgress: function(up, file) {
+			//document.getElementById('upload_percent').innerHTML = file.percent + "%";
+			//console.log(file.percent);
+		},
+
+		FileUploaded: function(up, file, info) {
+			upl_data = info.response.split("::");
+			//alert(upl_data);
+			console.log(upl_data)
+			//document.getElementById('ajax_loader').style.display= 'none';
+			if(upl_data[1]!=''){
+				var orig_img = upl_data[1];
+				var disp_img = upl_data[1];
+				document.getElementById('img_preview').innerHTML = '<img height="75px"  width="100px" src="/img/'+orig_img+'" >';
+				document.getElementById('sel_img').value = orig_img;
+			}else{
+				if(upl_data[0]=='Success'){
+					alert("Image Uploaded Successfully..");
+					return;
+				}
+				if(upl_data[0] == "failed"){
+				 	alert("Image Server not responding, Try after some time or contact CMS team");
+				}else{
+					 alert(upl_data[0]+" - Please upload a valid image.");
+				}
+				$(".loader").remove();
+			}
+	        },
+
+		Error: function(up, err) {
+			//$(".loader").remove();
+			alert(err.message+" - Please try after sometime.");
+			//document.getElementById('console').innerHTML += "\nError #" + err.code + ": " + err.message;
+		}
+	}
+});
+
+uploader.init();
+
 </script>
 {/literal}
 </html>
